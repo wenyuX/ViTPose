@@ -1,6 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import os
 import warnings
+import pickle as pkl
 from argparse import ArgumentParser
 
 import cv2
@@ -111,6 +112,8 @@ def main():
     # e.g. use ('backbone', ) to return backbone feature
     output_layer_names = None
 
+    pose_results_list = []
+
     while (cap.isOpened()):
         flag, img = cap.read()
         if not flag:
@@ -132,6 +135,8 @@ def main():
             dataset_info=dataset_info,
             return_heatmap=return_heatmap,
             outputs=output_layer_names)
+        # save pose_results
+        pose_results_list.append(pose_results)				
 
         # show the results
         vis_img = vis_pose_result(
@@ -159,6 +164,8 @@ def main():
         videoWriter.release()
     if args.show:
         cv2.destroyAllWindows()
+    with open(os.path.join(args.out_video_root, 'pose_results.pkl'), 'wb') as f:
+        pkl.dump(pose_results_list)
 
 
 if __name__ == '__main__':
